@@ -1,0 +1,35 @@
+{
+  "name": "nodejs_start",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "First Last <first.last@example.com>",
+  "main": "server.js",
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "private": true,
+  "scripts": {
+    "build": "npx tsc",
+    "test": "yarn run code-fix && yarn run code-check && npx jest",
+    "coverage": "npx jest --coverage",
+    "code-check": "npx prettier --check '**/*.ts'",
+    "code-fix": "npx prettier --write '**/*.ts'"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.2",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "eslint": "^7.32.0 || ^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.1.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-import-helpers": "^1.2.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^28.1.1",
+    "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
+  }
+}
