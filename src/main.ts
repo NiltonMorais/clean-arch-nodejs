@@ -1,9 +1,9 @@
-import Dimension from "./Dimension";
-import ExpressAdapter from "./ExpressAdapter";
-import GetItems from "./GetItems";
-import Item from "./Item";
-import ItemRepositoryDatabase from "./ItemRepositoryDatabase";
-import PgPromiseConnectionAdapter from "./PgPromiseConnectionAdapter";
+import Dimension from "./domain/entity/Dimension";
+import ExpressAdapter from "./infra/http/ExpressAdapter";
+import GetItems from "./application/GetItems";
+import Item from "./domain/entity/Item";
+import ItemRepositoryDatabase from "./infra/repository/database/ItemRepositoryDatabase";
+import PgPromiseConnectionAdapter from "./infra/database/PgPromiseConnectionAdapter";
 
 const connection = new PgPromiseConnectionAdapter();
 const itemRepository = new ItemRepositoryDatabase(connection);
