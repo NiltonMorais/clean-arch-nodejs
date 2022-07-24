@@ -1,14 +1,33 @@
 version: '3.8'
 services:
-  node-app:
-    container_name: node-app
-    image: "node:18"
-    user: "node"
-    working_dir: /home/node/app
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - ./:/home/node/app
-    ports:
-      - "3000:3000"
-    command: "sleep infinity"
+    node-app:
+        container_name: node-app
+        image: "node:18"
+        user: "node"
+        working_dir: /home/node/app
+        environment:
+        - NODE_ENV=development
+        volumes:
+        - ./:/home/node/app
+        ports:
+        - "3000:3000"
+        command: "sleep infinity"
+
+    nodeapp-mongo:
+        container_name: nodeapp-mongo
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
+
+    nodeapp-mongo-express:
+        container_name: nodeapp-mongo-express
+        image: mongo-express
+        restart: always
+        ports:
+        - 8081:8081
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: example
+            ME_CONFIG_MONGODB_URL: mongodb://root:example@nodeapp-mongo:27017/

@@ -1,8 +1,8 @@
-import Dimension from "../../src/domain/entity/Dimension";
-import Item from "../../src/domain/entity/Item";
-import ItemRepositoryMemory from "../../src/infra/repository/memory/ItemRepositoryMemory";
-import OrderRepositoryMemory from "../../src/infra/repository/memory/OrderRepositoryMemory";
-import PlaceOrder from "../../src/application/PlaceOrder";
+import ItemRepositoryMemory from "../../../src/infra/repository/memory/ItemRepositoryMemory";
+import OrderRepositoryMemory from "../../../src/infra/repository/memory/OrderRepositoryMemory";
+import PlaceOrder from "../../../src/application/PlaceOrder";
+import Dimension from "../../../src/domain/entity/Dimension";
+import Item from "../../../src/domain/entity/Item";
 
 test("Deve fazer um pedido", async function () {
     const itemRepository = new ItemRepositoryMemory();
