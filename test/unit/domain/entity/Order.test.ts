@@ -1,12 +1,17 @@
-import Coupon from "../../src/domain/entity/Coupon";
-import Dimension from "../../src/domain/entity/Dimension";
-import Item from "../../src/domain/entity/Item";
-import Order from "../../src/domain/entity/Order";
+import Coupon from "../../../../src/domain/entity/Coupon";
+import Dimension from "../../../../src/domain/entity/Dimension";
+import Item from "../../../../src/domain/entity/Item";
+import Order from "../../../../src/domain/entity/Order";
 
 test("Não deve criar um pedido com cpf", function () {
     expect(() => new Order("111.111.111-11")).toThrow(
         new Error("CPF Inválido")
     );
+});
+
+test("Deve criar um pedido com 3 itense gerar um código seguindo padrão AAAAPPPPPPPP", function () {
+    const order = new Order("935.411.347-80", new Date("2021-03-01T10:00:00"));
+    expect(order.code.value).toBe("202100000001");
 });
 
 test("Deve criar um pedido com 3 itens", function () {
