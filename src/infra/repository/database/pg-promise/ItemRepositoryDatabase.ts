@@ -1,4 +1,4 @@
-import Connection from "../../../database/Connection";
+import Connection from "../../../database/ConnectionSql";
 import Item from "../../../../domain/entity/Item";
 import ItemRepository from "../../../../domain/repository/ItemRepository";
 

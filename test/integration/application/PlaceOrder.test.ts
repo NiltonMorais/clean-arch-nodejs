@@ -6,8 +6,11 @@ import Item from "../../../src/domain/entity/Item";
 import CouponRepositoryMemory from "../../../src/infra/repository/memory/CouponRepositoryMemory";
 import Coupon from "../../../src/domain/entity/Coupon";
 
+const orderRepository = new OrderRepositoryMemory();
+const itemRepository = new ItemRepositoryMemory();
+const couponRepository = new CouponRepositoryMemory();
+
 test("Deve fazer um pedido", async function () {
-    const itemRepository = new ItemRepositoryMemory();
     itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
@@ -16,8 +19,6 @@ test("Deve fazer um pedido", async function () {
     );
     itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
 
-    const orderRepository = new OrderRepositoryMemory();
-    const couponRepository = new CouponRepositoryMemory();
     const placeOrder = new PlaceOrder(
         itemRepository,
         orderRepository,
@@ -36,7 +37,7 @@ test("Deve fazer um pedido", async function () {
 });
 
 test("Deve fazer um pedido e gerar o código do pedido", async function () {
-    const itemRepository = new ItemRepositoryMemory();
+    const sequence = (await orderRepository.count()) + 1;
     itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
@@ -44,9 +45,6 @@ test("Deve fazer um pedido e gerar o código do pedido", async function () {
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
     itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
-
-    const orderRepository = new OrderRepositoryMemory();
-    const couponRepository = new CouponRepositoryMemory();
     const placeOrder = new PlaceOrder(
         itemRepository,
         orderRepository,
@@ -62,11 +60,11 @@ test("Deve fazer um pedido e gerar o código do pedido", async function () {
         date: new Date("2021-03-01T10:00:00"),
     };
     const output = await placeOrder.execute(input);
-    expect(output.code).toBe("202100000001");
+    const sequencePad = new String(sequence).padStart(8, "0");
+    expect(output.code).toBe("2021" + sequencePad);
 });
 
 test("Deve fazer um pedido com desconto", async function () {
-    const itemRepository = new ItemRepositoryMemory();
     itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
@@ -74,8 +72,6 @@ test("Deve fazer um pedido com desconto", async function () {
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
     itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
-    const orderRepository = new OrderRepositoryMemory();
-    const couponRepository = new CouponRepositoryMemory();
     couponRepository.save(new Coupon("VALE20", 20));
     const placeOrder = new PlaceOrder(
         itemRepository,

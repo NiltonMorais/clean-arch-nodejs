@@ -1,7 +1,7 @@
-import Connection from "./Connection";
+import ConnectionSql from "./ConnectionSql";
 import pgp from "pg-promise";
 
-export default class PgPromiseConnectionAdapter implements Connection {
+export default class PgPromiseConnectionAdapter implements ConnectionSql {
     pgp: any;
 
     constructor() {
@@ -10,5 +10,9 @@ export default class PgPromiseConnectionAdapter implements Connection {
 
     query(statement: string, params: any): Promise<any> {
         return this.pgp.query(statement, params);
+    }
+
+    close(): Promise<void> {
+        return this.pgp.$pool.end();
     }
 }
