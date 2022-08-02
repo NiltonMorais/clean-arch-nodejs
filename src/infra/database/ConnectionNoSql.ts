@@ -1,8 +1,8 @@
 export default interface ConnectionNoSql {
-    setCollection(collectionName: string): void;
-    findOne(filter: object): Promise<any>;
-    insertOne(item: object): Promise<any>;
-    list(): Promise<any[]>;
-    count(): Promise<number>;
+    findOne(collection:string, filter: object): Promise<any>;
+    insertOne(collection:string, item: object): Promise<any>;
+    list(collection:string): Promise<any[]>;
+    count(collection:string): Promise<number>;
+    clear(collection:string): Promise<void>;
     close(): Promise<void>;
 }

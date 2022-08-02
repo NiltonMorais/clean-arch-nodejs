@@ -18,7 +18,6 @@ test("Deve fazer um pedido", async function () {
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
     itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
-
     const placeOrder = new PlaceOrder(
         itemRepository,
         orderRepository,
@@ -72,7 +71,7 @@ test("Deve fazer um pedido com desconto", async function () {
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
     itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
-    couponRepository.save(new Coupon("VALE20", 20));
+    couponRepository.save(new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00")));
     const placeOrder = new PlaceOrder(
         itemRepository,
         orderRepository,
@@ -86,6 +85,7 @@ test("Deve fazer um pedido com desconto", async function () {
             { idItem: 3, quantity: 3 },
         ],
         coupon: "VALE20",
+        date: new Date("2021-03-01T10:00:00")
     };
     const output = await placeOrder.execute(input);
     expect(output.total).toBe(5132);
