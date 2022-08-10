@@ -3,7 +3,11 @@ export default class Dimension {
         readonly width: number,
         readonly height: number,
         readonly length: number
-    ) {}
+    ) {
+        if (width < 0 || height < 0 || length < 0) {
+            throw new Error("Invalid dimension");
+        }
+    }
 
     getVolume(): number {
         if (this.height && this.width && this.length) {

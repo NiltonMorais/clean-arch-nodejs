@@ -64,3 +64,17 @@ test("Deve criar um pedido com 3 itens calcular o frete", function () {
     const total = order.getTotal();
     expect(total).toBe(6350);
 });
+
+test("Deve lançar uma exception se o item for adicionado mais de uma vez", function () {
+    const order = new Order("935.411.347-80");
+    order.addItem(
+        new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3),
+        1
+    );
+    expect(() =>
+        order.addItem(
+            new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3),
+            1
+        )
+    ).toThrow(new Error("Item is already added"));
+});

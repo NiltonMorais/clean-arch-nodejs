@@ -24,8 +24,15 @@ export default class Order {
     }
 
     addItem(item: Item, quantity: number) {
+        if (this.hasItem(item.idItem)) {
+            throw new Error("Item is already added");
+        }
         this.freight.addItem(item, quantity);
         this.orderItems.push(new OrderItem(item.idItem, item.price, quantity));
+    }
+
+    hasItem(idItem: number): boolean {
+        return this.orderItems.some((orderItem) => orderItem.idItem === idItem);
     }
 
     addCoupon(coupon: Coupon) {
