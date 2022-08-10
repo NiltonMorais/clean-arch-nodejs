@@ -1,4 +1,4 @@
-import GetOrders from "../../../src/application/GetOrders";
+import GetOrder from "../../../src/application/GetOrder";
 import ConnectionNoSql from "../../../src/infra/database/ConnectionNoSql";
 import OrderRepository from "../../../src/domain/repository/OrderRepository";
 import MongoDbConnectionAdapter from "../../../src/infra/database/MongoDbConnectionAdapter";
@@ -30,13 +30,8 @@ afterEach(async () => {
     await connection.close();
 });
 
-test("Deve obter uma lista vazia de pedidos", async function () {
-    const getOrders = new GetOrders(orderRepository);
-    const output = await getOrders.execute();
-    expect(output).toHaveLength(0);
-});
-
-test("Deve obter os pedidos cadastrados", async function () {
+test("Deve obter um pedido pelo código", async function () {
+    const sequence = (await orderRepository.count()) + 1;
     await itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
@@ -65,13 +60,9 @@ test("Deve obter os pedidos cadastrados", async function () {
         date: new Date("2021-03-01T10:00:00"),
     };
     await placeOrder.execute(input);
-    await placeOrder.execute(input);
-    const getOrders = new GetOrders(orderRepository);
-    const output = await getOrders.execute();
-    expect(output).toHaveLength(2);
-    const [order1, order2] = output;
-    expect(order1.code).toBe("202100000001");
-    expect(order1.total).toBe(5132);
-    expect(order2.code).toBe("202100000002");
-    expect(order2.total).toBe(5132);
+    const getOrder = new GetOrder(orderRepository);
+    const sequencePad = new String(sequence).padStart(8, "0");
+    const output = await getOrder.execute("2021" + sequencePad);
+    expect(output.code).toBe("2021" + sequencePad);
+    expect(output.total).toBe(5132);
 });

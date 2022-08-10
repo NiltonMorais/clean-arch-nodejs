@@ -6,8 +6,7 @@ import ConnectionNoSql from "../../../database/ConnectionNoSql";
 export default class ItemRepositoryDatabase implements ItemRepository {
     readonly collection: string = "items";
 
-    constructor(readonly db: ConnectionNoSql) {
-    }
+    constructor(readonly db: ConnectionNoSql) {}
 
     async get(idItem: number): Promise<Item> {
         const filter = { idItem: idItem };
@@ -18,8 +17,12 @@ export default class ItemRepositoryDatabase implements ItemRepository {
         }
 
         let dimension = undefined;
-        if(itemData.dimension){
-            dimension = new Dimension(itemData.dimension.width, itemData.dimension.height, itemData.dimension.length);
+        if (itemData.dimension) {
+            dimension = new Dimension(
+                itemData.dimension.width,
+                itemData.dimension.height,
+                itemData.dimension.length
+            );
         }
 
         return new Item(

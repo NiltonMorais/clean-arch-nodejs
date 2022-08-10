@@ -7,8 +7,7 @@ import ConnectionNoSql from "../../../database/ConnectionNoSql";
 export default class OrderRepositoryDatabase implements OrderRepository {
     readonly collection: string = "orders";
 
-    constructor(readonly db: ConnectionNoSql) {
-    }
+    constructor(readonly db: ConnectionNoSql) {}
 
     async save(order: Order): Promise<void> {
         return await this.db.insertOne(this.collection, order);
@@ -39,7 +38,14 @@ export default class OrderRepositoryDatabase implements OrderRepository {
             orderData.date,
             orderData.sequence
         );
-        order.orderItems = orderData.orderItems.map((orderItemData: any) => new OrderItem(orderItemData.idItem, orderItemData.price, orderItemData.quantity));
+        order.orderItems = orderData.orderItems.map(
+            (orderItemData: any) =>
+                new OrderItem(
+                    orderItemData.idItem,
+                    orderItemData.price,
+                    orderItemData.quantity
+                )
+        );
         order.freight.total = orderData.freight.total;
         if (orderData.coupon) {
             order.coupon = new OrderCoupon(
