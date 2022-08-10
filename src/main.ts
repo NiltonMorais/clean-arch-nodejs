@@ -1,17 +1,16 @@
 import ExpressAdapter from "./infra/http/ExpressAdapter";
-import GetItems from "./application/GetItems";
-import ItemRepositoryDatabase from "./infra/repository/database/pg-promise/ItemRepositoryDatabase";
-import PgPromiseConnectionAdapter from "./infra/database/PgPromiseConnectionAdapter";
+import ItemRepositoryDatabase from "./infra/repository/database/mongodb/ItemRepositoryDatabase";
+import ItemController from "./infra/controller/ItemController";
+import MongoDbConnectionAdapter from "./infra/database/MongoDbConnectionAdapter";
+import OrderRepositoryDatabase from "./infra/repository/database/mongodb/OrderRepositoryDatabase";
+import OrderController from "./infra/controller/OrderController";
 
-const connection = new PgPromiseConnectionAdapter();
+const connection = new MongoDbConnectionAdapter();
 const itemRepository = new ItemRepositoryDatabase(connection);
+const orderRepository = new OrderRepositoryDatabase(connection);
 
 const http = new ExpressAdapter();
-
-http.on("GET", "/items", async function (params: any, body: any) {
-    const getItems = new GetItems(itemRepository);
-    const output = await getItems.execute();
-    return output;
-});
+new ItemController(http, itemRepository);
+new OrderController(http, orderRepository);
 
 http.listen(3000);

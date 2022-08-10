@@ -30,3 +30,8 @@ Entrando no container
 ```sh
 docker exec -it node-app sh
 ```
+
+Startando server
+```sh
+docker exec -it node-app yarn server
+```
