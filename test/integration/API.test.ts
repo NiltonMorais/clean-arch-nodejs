@@ -3,25 +3,24 @@ import PlaceOrder from "../../src/application/PlaceOrder";
 import Coupon from "../../src/domain/entity/Coupon";
 import Dimension from "../../src/domain/entity/Dimension";
 import Item from "../../src/domain/entity/Item";
+import RepositoryFactory from "../../src/domain/factory/RepositoryFactory";
 import CouponRepository from "../../src/domain/repository/CouponRepository";
 import ItemRepository from "../../src/domain/repository/ItemRepository";
-import OrderRepository from "../../src/domain/repository/OrderRepository";
 import ConnectionNoSql from "../../src/infra/database/ConnectionNoSql";
 import MongoDbConnectionAdapter from "../../src/infra/database/MongoDbConnectionAdapter";
-import ItemRepositoryDatabase from "../../src/infra/repository/database/mongodb/ItemRepositoryDatabase";
-import OrderRepositoryDatabase from "../../src/infra/repository/database/mongodb/OrderRepositoryDatabase";
-import CouponRepositoryMemory from "../../src/infra/repository/memory/CouponRepositoryMemory";
+import DatabaseNoSqlRepositoryFactory from "../../src/infra/factory/DatabaseNoSqlRepositoryFactory";
 
 let connection: ConnectionNoSql;
-let orderRepository: OrderRepository;
 let itemRepository: ItemRepository;
 let couponRepository: CouponRepository;
+let repositoryFactory: RepositoryFactory;
 
 beforeEach(async () => {
     connection = new MongoDbConnectionAdapter();
-    orderRepository = new OrderRepositoryDatabase(connection);
-    itemRepository = new ItemRepositoryDatabase(connection);
-    couponRepository = new CouponRepositoryMemory();
+    repositoryFactory = new DatabaseNoSqlRepositoryFactory(connection);
+    itemRepository = repositoryFactory.createItemRepository();
+    couponRepository = repositoryFactory.createCouponRepository();
+    const orderRepository = repositoryFactory.createOrderRepository();
     await orderRepository.clear();
     await itemRepository.clear();
 });
@@ -52,11 +51,7 @@ test.skip("Deve chamar /orders", async function () {
     couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
-    const placeOrder = new PlaceOrder(
-        itemRepository,
-        orderRepository,
-        couponRepository
-    );
+    const placeOrder = new PlaceOrder(repositoryFactory);
     const input = {
         cpf: "935.411.347-80",
         orderItems: [
@@ -91,11 +86,7 @@ test.skip("Deve chamar /orders/:code", async function () {
     couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
-    const placeOrder = new PlaceOrder(
-        itemRepository,
-        orderRepository,
-        couponRepository
-    );
+    const placeOrder = new PlaceOrder(repositoryFactory);
     const input = {
         cpf: "935.411.347-80",
         orderItems: [
