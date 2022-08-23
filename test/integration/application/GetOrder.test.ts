@@ -42,7 +42,7 @@ test("Deve obter um pedido pelo código", async function () {
     await itemRepository.save(
         new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1)
     );
-    couponRepository.save(
+    await couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
     const placeOrder = new PlaceOrder(repositoryFactory);
