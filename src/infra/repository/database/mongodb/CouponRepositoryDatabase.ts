@@ -27,4 +27,8 @@ export default class CouponRepositoryDatabase implements CouponRepository {
     async save(coupon: Coupon): Promise<void> {
         await this.db.insertOne(this.collection, coupon);
     }
+    
+    async clear(): Promise<void> {
+        await this.db.clear(this.collection);
+    }
 }

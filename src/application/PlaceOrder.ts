@@ -1,19 +1,23 @@
 import FreightCalculator from "../domain/entity/FreightCalculator";
 import Order from "../domain/entity/Order";
+import StockEntry from "../domain/entity/StockEntry";
 import RepositoryFactory from "../domain/factory/RepositoryFactory";
 import CouponRepository from "../domain/repository/CouponRepository";
 import ItemRepository from "../domain/repository/ItemRepository";
 import OrderRepository from "../domain/repository/OrderRepository";
+import StockEntryRepository from "../domain/repository/StockEntryRepository";
 
 export default class PlaceOrder {
     itemRepository: ItemRepository;
     orderRepository: OrderRepository;
     couponRepository: CouponRepository;
+    stockEntryRepository: StockEntryRepository;
 
     constructor(readonly repositoryFactory: RepositoryFactory) {
         this.itemRepository = repositoryFactory.createItemRepository();
         this.orderRepository = repositoryFactory.createOrderRepository();
         this.couponRepository = repositoryFactory.createCouponRepository();
+        this.stockEntryRepository = repositoryFactory.createStockEntryRepository();
     }
 
     async execute(input: Input): Promise<Output> {
@@ -32,6 +36,9 @@ export default class PlaceOrder {
         }
         // order.freight = (freight > 0 && freight < 10) ? 10 : freight; // exemplo domain service
         await this.orderRepository.save(order);
+        for(const orderItem of input.orderItems) {
+            await this.stockEntryRepository.save(new StockEntry(orderItem.idItem, "out", orderItem.quantity));
+        }
         const total = order.getTotal();
         return {
             code: order.code.value,

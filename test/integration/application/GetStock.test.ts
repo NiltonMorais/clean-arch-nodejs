@@ -11,10 +11,10 @@ test("Deve retornar o estoque de um item", async function(){
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
     const stockEntryRepository = repositoryFactory.createStockEntryRepository();
-    stockEntryRepository.save(new StockEntry(1, "in", 10));
-    stockEntryRepository.save(new StockEntry(1, "in", 10));
-    stockEntryRepository.save(new StockEntry(1, "out", 5));
-    stockEntryRepository.save(new StockEntry(1, "out", 5));
+    await stockEntryRepository.save(new StockEntry(1, "in", 10));
+    await stockEntryRepository.save(new StockEntry(1, "in", 10));
+    await stockEntryRepository.save(new StockEntry(1, "out", 5));
+    await stockEntryRepository.save(new StockEntry(1, "out", 5));
     const getStock = new GetStock(repositoryFactory);
     const output = await getStock.execute(1);
     expect(output.total).toBe(10);

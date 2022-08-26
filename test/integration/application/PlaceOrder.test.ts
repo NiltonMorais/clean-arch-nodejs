@@ -3,18 +3,27 @@ import Dimension from "../../../src/domain/entity/Dimension";
 import Item from "../../../src/domain/entity/Item";
 import Coupon from "../../../src/domain/entity/Coupon";
 import MemoryRepositoryFactory from "../../../src/infra/factory/MemoryRepositoryFactory";
+import GetStock from '../../../src/application/GetStock';
+import OrderRepository from "../../../src/domain/repository/OrderRepository";
+import ItemRepository from "../../../src/domain/repository/ItemRepository";
+import CouponRepository from "../../../src/domain/repository/CouponRepository";
+import StockEntryRepository from "../../../src/domain/repository/StockEntryRepository";
 
 const repositoryFactory = new MemoryRepositoryFactory();
-let orderRepository = repositoryFactory.createOrderRepository();
-let itemRepository = repositoryFactory.createItemRepository();
-let couponRepository = repositoryFactory.createCouponRepository();
+let orderRepository: OrderRepository;
+let itemRepository: ItemRepository;
+let couponRepository: CouponRepository;
+let stockEntryRepository: StockEntryRepository;
 
 beforeEach(async () => {
     orderRepository = repositoryFactory.createOrderRepository();
     itemRepository = repositoryFactory.createItemRepository();
     couponRepository = repositoryFactory.createCouponRepository();
+    stockEntryRepository = repositoryFactory.createStockEntryRepository();
     await orderRepository.clear();
     await itemRepository.clear();
+    await couponRepository.clear();
+    await stockEntryRepository.clear();
 });
 
 test("Deve fazer um pedido", async function () {
@@ -86,4 +95,27 @@ test("Deve fazer um pedido com desconto", async function () {
     };
     const output = await placeOrder.execute(input);
     expect(output.total).toBe(5132);
+});
+
+test("Deve fazer um pedido e lançar no estoque", async function () {
+    itemRepository.save(
+        new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
+    );
+    itemRepository.save(
+        new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
+    );
+    itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
+    const placeOrder = new PlaceOrder(repositoryFactory);
+    const input = {
+        cpf: "935.411.347-80",
+        orderItems: [
+            { idItem: 1, quantity: 1 },
+            { idItem: 2, quantity: 1 },
+            { idItem: 3, quantity: 3 },
+        ],
+    };
+    await placeOrder.execute(input);
+    const getStock = new GetStock(repositoryFactory);
+    const output = await getStock.execute(3);
+    expect(output.total).toBe(-3);
 });

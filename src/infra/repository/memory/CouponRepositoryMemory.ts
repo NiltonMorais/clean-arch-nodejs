@@ -17,4 +17,8 @@ export default class CouponRepositoryMemory implements CouponRepository {
     async save(coupon: Coupon): Promise<void> {
         this.coupons.push(coupon);
     }
+    
+    async clear(): Promise<void> {
+        this.coupons = [];
+    }
 }
