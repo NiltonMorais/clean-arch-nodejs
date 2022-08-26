@@ -6,23 +6,30 @@ import Item from "../../src/domain/entity/Item";
 import RepositoryFactory from "../../src/domain/factory/RepositoryFactory";
 import CouponRepository from "../../src/domain/repository/CouponRepository";
 import ItemRepository from "../../src/domain/repository/ItemRepository";
+import OrderRepository from "../../src/domain/repository/OrderRepository";
 import ConnectionNoSql from "../../src/infra/database/ConnectionNoSql";
 import MongoDbConnectionAdapter from "../../src/infra/database/MongoDbConnectionAdapter";
 import DatabaseNoSqlRepositoryFactory from "../../src/infra/factory/DatabaseNoSqlRepositoryFactory";
+import MemoryQueueAdapter from "../../src/infra/queue/MemoryQueueAdapter";
+import Queue from "../../src/infra/queue/Queue";
 
 let connection: ConnectionNoSql;
 let itemRepository: ItemRepository;
 let couponRepository: CouponRepository;
 let repositoryFactory: RepositoryFactory;
+let orderRepository: OrderRepository;
+let queue: Queue;
 
 beforeEach(async () => {
     connection = new MongoDbConnectionAdapter();
     repositoryFactory = new DatabaseNoSqlRepositoryFactory(connection);
     itemRepository = repositoryFactory.createItemRepository();
     couponRepository = repositoryFactory.createCouponRepository();
-    const orderRepository = repositoryFactory.createOrderRepository();
+    orderRepository = repositoryFactory.createOrderRepository();
+    queue = new MemoryQueueAdapter();
     await orderRepository.clear();
     await itemRepository.clear();
+    await couponRepository.clear();
 });
 
 afterEach(async () => {
@@ -51,7 +58,7 @@ test.skip("Deve chamar /orders", async function () {
     couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
-    const placeOrder = new PlaceOrder(repositoryFactory);
+    const placeOrder = new PlaceOrder(repositoryFactory, queue);
     const input = {
         cpf: "935.411.347-80",
         orderItems: [
@@ -86,7 +93,7 @@ test.skip("Deve chamar /orders/:code", async function () {
     couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
-    const placeOrder = new PlaceOrder(repositoryFactory);
+    const placeOrder = new PlaceOrder(repositoryFactory, queue);
     const input = {
         cpf: "935.411.347-80",
         orderItems: [

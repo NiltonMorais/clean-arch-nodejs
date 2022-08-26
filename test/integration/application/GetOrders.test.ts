@@ -10,12 +10,15 @@ import CouponRepository from "../../../src/domain/repository/CouponRepository";
 import Coupon from "../../../src/domain/entity/Coupon";
 import RepositoryFactory from "../../../src/domain/factory/RepositoryFactory";
 import DatabaseNoSqlRepositoryFactory from "../../../src/infra/factory/DatabaseNoSqlRepositoryFactory";
+import Queue from "../../../src/infra/queue/Queue";
+import MemoryQueueAdapter from "../../../src/infra/queue/MemoryQueueAdapter";
 
 let connection: ConnectionNoSql;
 let orderRepository: OrderRepository;
 let itemRepository: ItemRepository;
 let couponRepository: CouponRepository;
 let repositoryFactory: RepositoryFactory;
+let queue: Queue;
 
 beforeEach(async () => {
     connection = new MongoDbConnectionAdapter();
@@ -23,8 +26,10 @@ beforeEach(async () => {
     orderRepository = repositoryFactory.createOrderRepository();
     itemRepository = repositoryFactory.createItemRepository();
     couponRepository = repositoryFactory.createCouponRepository();
+    queue = new MemoryQueueAdapter();
     await orderRepository.clear();
     await itemRepository.clear();
+    await couponRepository.clear();
 });
 
 afterEach(async () => {
@@ -50,7 +55,7 @@ test("Deve obter os pedidos cadastrados", async function () {
     await couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
-    const placeOrder = new PlaceOrder(repositoryFactory);
+    const placeOrder = new PlaceOrder(repositoryFactory, queue);
     const input = {
         cpf: "935.411.347-80",
         orderItems: [

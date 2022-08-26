@@ -1,11 +1,13 @@
 import FreightCalculator from "../domain/entity/FreightCalculator";
 import Order from "../domain/entity/Order";
 import StockEntry from "../domain/entity/StockEntry";
+import OrderPlaced from "../domain/event/OrderPlaced";
 import RepositoryFactory from "../domain/factory/RepositoryFactory";
 import CouponRepository from "../domain/repository/CouponRepository";
 import ItemRepository from "../domain/repository/ItemRepository";
 import OrderRepository from "../domain/repository/OrderRepository";
 import StockEntryRepository from "../domain/repository/StockEntryRepository";
+import Queue from "../infra/queue/Queue";
 
 export default class PlaceOrder {
     itemRepository: ItemRepository;
@@ -13,7 +15,7 @@ export default class PlaceOrder {
     couponRepository: CouponRepository;
     stockEntryRepository: StockEntryRepository;
 
-    constructor(readonly repositoryFactory: RepositoryFactory) {
+    constructor(readonly repositoryFactory: RepositoryFactory, readonly queue: Queue) {
         this.itemRepository = repositoryFactory.createItemRepository();
         this.orderRepository = repositoryFactory.createOrderRepository();
         this.couponRepository = repositoryFactory.createCouponRepository();
@@ -36,9 +38,8 @@ export default class PlaceOrder {
         }
         // order.freight = (freight > 0 && freight < 10) ? 10 : freight; // exemplo domain service
         await this.orderRepository.save(order);
-        for(const orderItem of input.orderItems) {
-            await this.stockEntryRepository.save(new StockEntry(orderItem.idItem, "out", orderItem.quantity));
-        }
+        const orderPlaced = new OrderPlaced(order.code.value, order.orderItems);
+        await this.queue.publish(orderPlaced);
         const total = order.getTotal();
         return {
             code: order.code.value,
