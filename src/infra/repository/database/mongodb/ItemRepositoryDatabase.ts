@@ -9,7 +9,7 @@ export default class ItemRepositoryDatabase implements ItemRepository {
     constructor(readonly db: ConnectionNoSql) {}
 
     async get(idItem: number): Promise<Item> {
-        const filter = { idItem: idItem };
+        const filter = { idItem };
         const itemData = await this.db.findOne(this.collection, filter);
 
         if (!itemData) {

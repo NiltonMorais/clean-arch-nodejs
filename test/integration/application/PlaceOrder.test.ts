@@ -5,9 +5,17 @@ import Coupon from "../../../src/domain/entity/Coupon";
 import MemoryRepositoryFactory from "../../../src/infra/factory/MemoryRepositoryFactory";
 
 const repositoryFactory = new MemoryRepositoryFactory();
-const orderRepository = repositoryFactory.createOrderRepository();
-const itemRepository = repositoryFactory.createItemRepository();
-const couponRepository = repositoryFactory.createCouponRepository();
+let orderRepository = repositoryFactory.createOrderRepository();
+let itemRepository = repositoryFactory.createItemRepository();
+let couponRepository = repositoryFactory.createCouponRepository();
+
+beforeEach(async () => {
+    orderRepository = repositoryFactory.createOrderRepository();
+    itemRepository = repositoryFactory.createItemRepository();
+    couponRepository = repositoryFactory.createCouponRepository();
+    await orderRepository.clear();
+    await itemRepository.clear();
+});
 
 test("Deve fazer um pedido", async function () {
     itemRepository.save(
