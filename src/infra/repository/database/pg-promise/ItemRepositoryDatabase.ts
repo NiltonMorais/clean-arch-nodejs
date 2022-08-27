@@ -4,7 +4,7 @@ import ItemRepository from "../../../../domain/repository/ItemRepository";
 
 export default class ItemRepositoryDatabase implements ItemRepository {
     constructor(readonly connection: Connection) {}
-    
+
     clear(): Promise<void> {
         throw new Error("Method not implemented.");
     }

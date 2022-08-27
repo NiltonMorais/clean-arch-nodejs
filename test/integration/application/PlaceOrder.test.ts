@@ -3,14 +3,14 @@ import Dimension from "../../../src/domain/entity/Dimension";
 import Item from "../../../src/domain/entity/Item";
 import Coupon from "../../../src/domain/entity/Coupon";
 import MemoryRepositoryFactory from "../../../src/infra/factory/MemoryRepositoryFactory";
-import GetStock from '../../../src/application/GetStock';
+import GetStock from "../../../src/application/GetStock";
 import OrderRepository from "../../../src/domain/repository/OrderRepository";
 import ItemRepository from "../../../src/domain/repository/ItemRepository";
 import CouponRepository from "../../../src/domain/repository/CouponRepository";
 import StockEntryRepository from "../../../src/domain/repository/StockEntryRepository";
 import Queue from "../../../src/infra/queue/Queue";
-import MemoryQueueAdapter from '../../../src/infra/queue/MemoryQueueAdapter';
-import StockController from '../../../src/infra/controller/StockController';
+import MemoryQueueAdapter from "../../../src/infra/queue/MemoryQueueAdapter";
+import StockController from "../../../src/infra/controller/StockController";
 
 const repositoryFactory = new MemoryRepositoryFactory();
 let orderRepository: OrderRepository;

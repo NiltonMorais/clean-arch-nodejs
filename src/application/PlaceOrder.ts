@@ -15,11 +15,15 @@ export default class PlaceOrder {
     couponRepository: CouponRepository;
     stockEntryRepository: StockEntryRepository;
 
-    constructor(readonly repositoryFactory: RepositoryFactory, readonly queue: Queue) {
+    constructor(
+        readonly repositoryFactory: RepositoryFactory,
+        readonly queue: Queue
+    ) {
         this.itemRepository = repositoryFactory.createItemRepository();
         this.orderRepository = repositoryFactory.createOrderRepository();
         this.couponRepository = repositoryFactory.createCouponRepository();
-        this.stockEntryRepository = repositoryFactory.createStockEntryRepository();
+        this.stockEntryRepository =
+            repositoryFactory.createStockEntryRepository();
     }
 
     async execute(input: Input): Promise<Output> {

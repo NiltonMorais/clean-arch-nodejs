@@ -9,7 +9,6 @@ import OrderRepositoryMemory from "../repository/memory/OrderRepositoryMemory";
 import StockEntryRepositoryMemory from "../repository/memory/StockEntryRepositoryMemory";
 
 export default class MemoryRepositoryFactory implements RepositoryFactory {
-
     itemRepository?: ItemRepository;
     orderRepository?: OrderRepository;
     couponRepository?: CouponRepository;
