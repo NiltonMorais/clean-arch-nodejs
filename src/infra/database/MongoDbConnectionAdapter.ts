@@ -24,8 +24,11 @@ export default class MongoDbConnectionAdapter implements ConnectionNoSql {
         return await this.database.collection(collection).insertOne(item);
     }
 
-    async list(collection: string): Promise<any[]> {
-        return await this.database.collection(collection).find().toArray();
+    async list(collection: string, filter: object = {}): Promise<any[]> {
+        return await this.database
+            .collection(collection)
+            .find(filter)
+            .toArray();
     }
 
     async count(collection: string): Promise<number> {

@@ -13,7 +13,7 @@ export default class ItemRepositoryDatabase implements ItemRepository {
         const itemData = await this.db.findOne(this.collection, filter);
 
         if (!itemData) {
-            throw new Error("Item not found");
+            throw new Error(`Item id ${idItem} not found`);
         }
 
         let dimension = undefined;
@@ -44,7 +44,7 @@ export default class ItemRepositoryDatabase implements ItemRepository {
         for (const itemData of itemsData) {
             items.push(
                 new Item(
-                    itemData.id_item,
+                    itemData.idItem,
                     itemData.description,
                     parseFloat(itemData.price)
                 )

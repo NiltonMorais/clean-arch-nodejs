@@ -4,6 +4,14 @@ import Queue from "./Queue";
 export default class MemoryQueueAdapter implements Queue {
     consumers: Consumer[] = [];
 
+    connect(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
+    close(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
     async consume(eventName: string, callback: Function): Promise<void> {
         this.consumers.push({ eventName, callback });
     }

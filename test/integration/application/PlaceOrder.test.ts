@@ -11,8 +11,13 @@ import StockEntryRepository from "../../../src/domain/repository/StockEntryRepos
 import Queue from "../../../src/infra/queue/Queue";
 import MemoryQueueAdapter from "../../../src/infra/queue/MemoryQueueAdapter";
 import StockController from "../../../src/infra/controller/StockController";
+import RabbitMQAdapter from "../../../src/infra/queue/RabbitMQAdapter";
+import DatabaseNoSqlRepositoryFactory from "../../../src/infra/factory/DatabaseNoSqlRepositoryFactory";
+import MongoDbConnectionAdapter from "../../../src/infra/database/MongoDbConnectionAdapter";
 
 const repositoryFactory = new MemoryRepositoryFactory();
+//const connection = new MongoDbConnectionAdapter();
+//const repositoryFactory = new DatabaseNoSqlRepositoryFactory(connection);
 let orderRepository: OrderRepository;
 let itemRepository: ItemRepository;
 let couponRepository: CouponRepository;
@@ -25,20 +30,31 @@ beforeEach(async () => {
     couponRepository = repositoryFactory.createCouponRepository();
     stockEntryRepository = repositoryFactory.createStockEntryRepository();
     queue = new MemoryQueueAdapter();
+    //queue = new RabbitMQAdapter();
+    //await queue.connect();
     await orderRepository.clear();
     await itemRepository.clear();
     await couponRepository.clear();
     await stockEntryRepository.clear();
 });
 
+afterEach(async () => {
+    // setTimeout(async () => {
+    //     await queue.close();
+    //     await connection.close();
+    // }, 1000);
+});
+
 test("Deve fazer um pedido", async function () {
-    itemRepository.save(
+    await itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
-    itemRepository.save(
+    await itemRepository.save(
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
-    itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
+    await itemRepository.save(
+        new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1)
+    );
     const placeOrder = new PlaceOrder(repositoryFactory, queue);
     const input = {
         cpf: "935.411.347-80",
@@ -54,13 +70,15 @@ test("Deve fazer um pedido", async function () {
 
 test("Deve fazer um pedido e gerar o código do pedido", async function () {
     const sequence = (await orderRepository.count()) + 1;
-    itemRepository.save(
+    await itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
-    itemRepository.save(
+    await itemRepository.save(
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
-    itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
+    await itemRepository.save(
+        new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1)
+    );
     const placeOrder = new PlaceOrder(repositoryFactory, queue);
     const input = {
         cpf: "935.411.347-80",
@@ -77,14 +95,16 @@ test("Deve fazer um pedido e gerar o código do pedido", async function () {
 });
 
 test("Deve fazer um pedido com desconto", async function () {
-    itemRepository.save(
+    await itemRepository.save(
         new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
-    itemRepository.save(
+    await itemRepository.save(
         new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
-    itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
-    couponRepository.save(
+    await itemRepository.save(
+        new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1)
+    );
+    await couponRepository.save(
         new Coupon("VALE20", 20, new Date("2021-03-10T10:00:00"))
     );
     const placeOrder = new PlaceOrder(repositoryFactory, queue);
@@ -104,24 +124,28 @@ test("Deve fazer um pedido com desconto", async function () {
 
 test("Deve fazer um pedido e lançar no estoque", async function () {
     new StockController(queue, repositoryFactory);
-    itemRepository.save(
-        new Item(1, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
+    await itemRepository.save(
+        new Item(5, "Guitarra", 1000, new Dimension(100, 30, 10), 3)
     );
-    itemRepository.save(
-        new Item(2, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
+    await itemRepository.save(
+        new Item(6, "Amplificador", 5000, new Dimension(50, 50, 50), 20)
     );
-    itemRepository.save(new Item(3, "Cabo", 30, new Dimension(10, 10, 10), 1));
+    await itemRepository.save(
+        new Item(7, "Cabo", 30, new Dimension(10, 10, 10), 1)
+    );
     const placeOrder = new PlaceOrder(repositoryFactory, queue);
     const input = {
         cpf: "935.411.347-80",
         orderItems: [
-            { idItem: 1, quantity: 1 },
-            { idItem: 2, quantity: 1 },
-            { idItem: 3, quantity: 3 },
+            { idItem: 5, quantity: 1 },
+            { idItem: 6, quantity: 1 },
+            { idItem: 7, quantity: 3 },
         ],
     };
     await placeOrder.execute(input);
-    const getStock = new GetStock(repositoryFactory);
-    const output = await getStock.execute(3);
-    expect(output.total).toBe(-3);
+    setTimeout(async () => {
+        const getStock = new GetStock(repositoryFactory);
+        const output = await getStock.execute(7);
+        expect(output.total).toBe(-3);
+    }, 500);
 });

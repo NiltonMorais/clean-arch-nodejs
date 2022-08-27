@@ -31,3 +31,16 @@ services:
             ME_CONFIG_MONGODB_ADMINUSERNAME: root
             ME_CONFIG_MONGODB_ADMINPASSWORD: example
             ME_CONFIG_MONGODB_URL: mongodb://root:example@nodeapp-mongo:27017/
+
+    rabbitmq:
+        image: "rabbitmq:3.8-management-alpine"
+        container_name: rabbitmq
+        hostname: rabbitmq
+        ports:
+        - "15672:15672"
+        - "5672:5672"
+        volumes:
+        - "./.docker/rabbitmq_data:/var/lib/rabbitmq/mnesia"
+        environment:
+        - RABBITMQ_DEFAULT_USER=admin
+        - RABBITMQ_DEFAULT_PASS=admin

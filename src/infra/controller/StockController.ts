@@ -10,7 +10,7 @@ export default class StockController {
     ) {
         queue.consume("orderPlaced", async function (orderPlaced: OrderPlaced) {
             const stockHandler = new StockHandler(repositoryFactory);
-            stockHandler.handle(orderPlaced);
+            await stockHandler.handle(orderPlaced);
         });
     }
 }

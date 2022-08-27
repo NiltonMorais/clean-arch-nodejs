@@ -6,8 +6,8 @@ import ItemRepositoryDatabase from "../repository/database/mongodb/ItemRepositor
 import ConnectionNoSql from "../database/ConnectionNoSql";
 import OrderRepositoryDatabase from "../repository/database/mongodb/OrderRepositoryDatabase";
 import CouponRepositoryDatabase from "../repository/database/mongodb/CouponRepositoryDatabase";
-import StockEntryRepositoryMemory from "../repository/memory/StockEntryRepositoryMemory";
 import StockEntryRepository from "../../domain/repository/StockEntryRepository";
+import StockEntryRepositoryDatabase from "../repository/database/mongodb/StockEntryRepositoryDatabase";
 
 export default class DatabaseNoSqlRepositoryFactory
     implements RepositoryFactory
@@ -27,6 +27,6 @@ export default class DatabaseNoSqlRepositoryFactory
     }
 
     createStockEntryRepository(): StockEntryRepository {
-        return new StockEntryRepositoryMemory();
+        return new StockEntryRepositoryDatabase(this.connection);
     }
 }
