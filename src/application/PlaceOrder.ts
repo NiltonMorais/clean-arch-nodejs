@@ -43,7 +43,7 @@ export default class PlaceOrder {
         // order.freight = (freight > 0 && freight < 10) ? 10 : freight; // exemplo domain service
         await this.orderRepository.save(order);
         const orderPlaced = new OrderPlaced(order.code.value, order.orderItems);
-        await this.queue.publish(orderPlaced);
+        this.queue.publish(orderPlaced);
         const total = order.getTotal();
         return {
             code: order.code.value,

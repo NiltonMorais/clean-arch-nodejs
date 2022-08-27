@@ -14,24 +14,30 @@ import StockController from "../../../src/infra/controller/StockController";
 import RabbitMQAdapter from "../../../src/infra/queue/RabbitMQAdapter";
 import DatabaseNoSqlRepositoryFactory from "../../../src/infra/factory/DatabaseNoSqlRepositoryFactory";
 import MongoDbConnectionAdapter from "../../../src/infra/database/MongoDbConnectionAdapter";
+import RepositoryFactory from "../../../src/domain/factory/RepositoryFactory";
+import ConnectionNoSql from "../../../src/infra/database/ConnectionNoSql";
 
-const repositoryFactory = new MemoryRepositoryFactory();
-//const connection = new MongoDbConnectionAdapter();
-//const repositoryFactory = new DatabaseNoSqlRepositoryFactory(connection);
+let connection: ConnectionNoSql;
+let repositoryFactory: RepositoryFactory;
 let orderRepository: OrderRepository;
 let itemRepository: ItemRepository;
 let couponRepository: CouponRepository;
 let stockEntryRepository: StockEntryRepository;
 let queue: Queue;
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 beforeEach(async () => {
+    connection = new MongoDbConnectionAdapter();
+    repositoryFactory = new DatabaseNoSqlRepositoryFactory(connection);
+    // const repositoryFactory = new MemoryRepositoryFactory();
     orderRepository = repositoryFactory.createOrderRepository();
     itemRepository = repositoryFactory.createItemRepository();
     couponRepository = repositoryFactory.createCouponRepository();
     stockEntryRepository = repositoryFactory.createStockEntryRepository();
-    queue = new MemoryQueueAdapter();
-    //queue = new RabbitMQAdapter();
-    //await queue.connect();
+    //queue = new MemoryQueueAdapter();
+    queue = new RabbitMQAdapter();
+    await queue.connect();
     await orderRepository.clear();
     await itemRepository.clear();
     await couponRepository.clear();
@@ -39,10 +45,9 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-    // setTimeout(async () => {
-    //     await queue.close();
-    //     await connection.close();
-    // }, 1000);
+    await sleep(200);
+    await queue.close();
+    await connection.close();
 });
 
 test("Deve fazer um pedido", async function () {
@@ -143,9 +148,8 @@ test("Deve fazer um pedido e lançar no estoque", async function () {
         ],
     };
     await placeOrder.execute(input);
-    setTimeout(async () => {
-        const getStock = new GetStock(repositoryFactory);
-        const output = await getStock.execute(7);
-        expect(output.total).toBe(-3);
-    }, 500);
+    await sleep(200);
+    const getStock = new GetStock(repositoryFactory);
+    const output = await getStock.execute(7);
+    expect(output.total).toBe(-3);
 });
