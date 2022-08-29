@@ -1,22 +1,24 @@
 import ExpressAdapter from "./infra/http/ExpressAdapter";
-import ItemRepositoryDatabase from "./infra/repository/database/mongodb/ItemRepositoryDatabase";
 import ItemController from "./infra/controller/ItemController";
 import MongoDbConnectionAdapter from "./infra/database/MongoDbConnectionAdapter";
-import OrderRepositoryDatabase from "./infra/repository/database/mongodb/OrderRepositoryDatabase";
 import OrderController from "./infra/controller/OrderController";
-import MemoryQueueAdapter from "./infra/queue/MemoryQueueAdapter";
 import StockController from "./infra/controller/StockController";
-import MemoryRepositoryFactory from "./infra/factory/MemoryRepositoryFactory";
+import DatabaseNoSqlRepositoryFactory from "./infra/factory/DatabaseNoSqlRepositoryFactory";
+import RabbitMQAdapter from "./infra/queue/RabbitMQAdapter";
 
-const queue = new MemoryQueueAdapter();
-const connection = new MongoDbConnectionAdapter();
-const itemRepository = new ItemRepositoryDatabase(connection);
-const orderRepository = new OrderRepositoryDatabase(connection);
-const repositoryFactory = new MemoryRepositoryFactory();
+async function start(){
+    const queue = new RabbitMQAdapter();
+    await queue.connect();
+    const connection = new MongoDbConnectionAdapter();
+    const repositoryFactory = new DatabaseNoSqlRepositoryFactory(connection);
+    const itemRepository = repositoryFactory.createItemRepository()
 
-const http = new ExpressAdapter();
-new ItemController(http, itemRepository);
-new OrderController(http, orderRepository);
-new StockController(queue, repositoryFactory);
+    const http = new ExpressAdapter();
+    new ItemController(http, itemRepository);
+    new OrderController(http, repositoryFactory, queue);
+    new StockController(queue, repositoryFactory);
 
-http.listen(3000);
+    http.listen(3000);
+}
+
+start();

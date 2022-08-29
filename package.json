@@ -9,7 +9,7 @@
   "useWorkspaces": true,
   "private": true,
   "scripts": {
-    "server": "npx nodemon src/main.ts",
+    "server": "npx ts-node src/main.ts",
     "build": "npx tsc",
     "test": "yarn run code-fix && npx jest --runInBand",
     "coverage": "npx jest --coverage",
